@@ -1,11 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'
 
 @Component({
   selector: 'app-dashboard',
   template: `
-    <p>
-      dashboard works!
-    </p>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-lg-4">
+          <p>Informacion general</p>
+        </div>
+      </div>
+    </div>
   `,
   styles: [
   ]

@@ -1,0 +1,63 @@
+form {
+    border: 1px solid #ccc;
+    padding: 16px;
+}
+
+hr {
+    border: 1px solid #f1f1f1;
+    margin-bottom: 25px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+textarea {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+.signUp-btn {
+    background-color: #4caf50;
+}
+
+.signUp-btn:disabled {
+    background-color: #7c7d7c;
+    cursor: not-allowed;
+}
+
+.signUp-btn:active {
+    background-color: #235623;
+}
+
+.signUp-btn:hover, .cancel-btn:hover {
+    opacity: 1;
+}
+
+.cancel-btn {
+    padding: 14px 20px;
+    background-color: #f44336;
+}
+
+.signUp-btn, .cancel-btn {
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+}
+
+.cancel-btn, .signUp-btn {
+    width: 100%;
+}
+
+@media screen and (max-width: 300px) {
+    .cancel-btn, .signUp-btn {
+        width: 100%;
+    }
+}
