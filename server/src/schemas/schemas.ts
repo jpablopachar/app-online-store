@@ -1,12 +1,13 @@
 import { GraphQLObjectType, GraphQLSchema } from 'graphql'
 import { REGISTER } from './Mutations'
-import { LOGIN, USERS } from './Queries'
+import { LOGIN, ME, USERS } from './Queries'
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
     users: USERS,
-    login: LOGIN
+    login: LOGIN,
+    me: ME
   }
 })
 

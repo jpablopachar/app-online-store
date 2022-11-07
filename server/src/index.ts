@@ -1,6 +1,8 @@
 import { ApolloServer } from 'apollo-server-express'
 import { config } from 'dotenv'
+import { Db } from 'mongodb'
 import { app, dbConnection } from './config'
+import { IContext } from './models'
 import { schema } from './schemas'
 
 config()
@@ -12,7 +14,13 @@ const main = async (): Promise<void> => {
   const db = await dbConnection()
 
   try {
-    const context = { db }
+    const context = async ({ req, connection }: IContext): Promise<{ db: Db, token: any }> => {
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      const token = req ? req.headers.authorization : connection.authorization
+
+      return { db, token }
+    }
+
     const server = new ApolloServer({
       schema,
       introspection: true,

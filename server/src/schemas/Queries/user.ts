@@ -1,9 +1,8 @@
 import { compareSync } from 'bcrypt'
 import { GraphQLNonNull, GraphQLString } from 'graphql'
-import { Db } from 'mongodb'
-import { COLLECTIONS } from '../../config'
-import { signJwt } from '../../libs'
-import { ResultLogin, ResultUsers } from '../TypeDefs'
+import { COLLECTIONS, findElements, findOneElement, MESSAGES } from '../../config'
+import { signJwt, verifyJwt } from '../../libs'
+import { ResultLogin, ResultUser, ResultUsers } from '../TypeDefs'
 
 export const USERS = {
   type: ResultUsers,
@@ -12,7 +11,7 @@ export const USERS = {
       return {
         status: true,
         message: 'Lista de usuarios cargada correctamente',
-        users: await (db as Db).collection(COLLECTIONS.USERS).find().toArray()
+        users: await findElements(db, COLLECTIONS.USERS)
       }
     } catch {
       return {
@@ -32,9 +31,7 @@ export const LOGIN = {
   },
   async resolve (parent: any, { email, password }: any, { db }: any) {
     try {
-      const user = await (db as Db)
-        .collection(COLLECTIONS.USERS)
-        .findOne({ email })
+      const user = await findOneElement(db, COLLECTIONS.USERS, { email })
 
       if (user === null) {
         return {
@@ -66,6 +63,27 @@ export const LOGIN = {
         message: 'Error al iniciar sesión',
         token: null
       }
+    }
+  }
+}
+
+export const ME = {
+  type: ResultUser,
+  async resolve (parent: any, args: any, { token }: any) {
+    const info = await verifyJwt(token)
+
+    if (info === MESSAGES.TOKEN_VERICATION_FAILED) {
+      return {
+        status: false,
+        message: info,
+        user: null
+      }
+    }
+
+    return {
+      status: true,
+      message: 'Usuario cargado correctamente',
+      user: Object.values(info)[0]
     }
   }
 }
