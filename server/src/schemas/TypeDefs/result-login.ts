@@ -2,6 +2,7 @@ import {
   GraphQLBoolean, GraphQLNonNull, GraphQLObjectType,
   GraphQLString
 } from 'graphql'
+import { UserType } from './user'
 
 export const ResultLogin = new GraphQLObjectType({
   name: 'ResultLogin',
@@ -18,6 +19,10 @@ export const ResultLogin = new GraphQLObjectType({
     token: {
       type: GraphQLString,
       description: 'Información del token del usuario logueado'
+    },
+    user: {
+      type: UserType,
+      description: 'Información del usuario'
     }
   })
 })

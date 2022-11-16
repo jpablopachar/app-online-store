@@ -37,11 +37,12 @@ export const LOGIN = {
         return {
           status: false,
           message: 'El usuario no existe',
-          token: null
+          token: null,
+          user: null
         }
       }
 
-      const passwordCheck = compareSync(password, user.password)
+      const passwordCheck: boolean = compareSync(password, user.password)
 
       if (passwordCheck !== null) {
         delete user.password
@@ -55,13 +56,15 @@ export const LOGIN = {
           !passwordCheck
             ? 'Las credenciales son incorrectas'
             : 'Inicio de sesión satisfactorio',
-        token: !passwordCheck ? null : signJwt({ user })
+        token: !passwordCheck ? null : signJwt({ user }),
+        user
       }
     } catch {
       return {
         status: false,
         message: 'Error al iniciar sesión',
-        token: null
+        token: null,
+        user: null
       }
     }
   }

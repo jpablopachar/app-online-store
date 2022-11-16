@@ -7,13 +7,22 @@ const routes: Routes = [
     path: '',
     component: PublicComponent,
     children: [
-      { path: '', loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule) },
-    ]
-  }
+      {
+        path: '',
+        loadChildren: () =>
+          import('./pages/home/home.module').then((m) => m.HomeModule),
+      },
+      {
+        path: 'login',
+        loadChildren: () =>
+          import('./pages/login/login.module').then((m) => m.LoginModule),
+      },
+    ],
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class PublicRoutingModule { }
+export class PublicRoutingModule {}
