@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
+import { AdminGuard } from '@app/guards'
 import { AdminComponent } from './admin.component'
 
 const routes: Routes = [
   {
     path: '',
     component: AdminComponent,
+    canActivateChild: [AdminGuard],
     children: [
       {
         path: '',

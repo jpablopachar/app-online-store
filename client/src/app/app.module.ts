@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser'
 import { AppRoutingModule } from './app-routing.module'
 import { AppComponent } from './app.component'
 import { GraphQLModule } from './graphql'
+import { AuthServiceModule } from './services'
 
 @NgModule({
   declarations: [
@@ -13,7 +14,8 @@ import { GraphQLModule } from './graphql'
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    GraphQLModule
+    GraphQLModule,
+    AuthServiceModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

@@ -94,12 +94,10 @@ export const optionsWithDetails = async (
     cancelButtonColor: '#dc3545',
     confirmButtonText,
     cancelButtonText,
-  }).then((res: SweetAlertResult<any>): boolean | undefined => {
-    if (res.value) {
-      return true;
-    } else if (res.dismiss?.toString() === 'cancel') {
-      return false;
-    }
+  }).then((res: SweetAlertResult<any>): boolean => {
+    if (res.value) return true;
+
+    return false;
   });
 };
 
