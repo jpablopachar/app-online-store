@@ -1,20 +1,23 @@
 import { GraphQLObjectType, GraphQLSchema } from 'graphql'
-import { REGISTER } from './Mutations'
-import { LOGIN, ME, USERS } from './Queries'
+import { ADD_GENRE, REGISTER } from './Mutations'
+import { GENRE, GENRES, LOGIN, ME, USERS } from './Queries'
 
 const RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   fields: {
     users: USERS,
     login: LOGIN,
-    me: ME
+    me: ME,
+    genre: GENRE,
+    genres: GENRES
   }
 })
 
 const Mutation = new GraphQLObjectType({
   name: 'Mutation',
   fields: {
-    register: REGISTER
+    register: REGISTER,
+    addGenre: ADD_GENRE
   }
 })
 

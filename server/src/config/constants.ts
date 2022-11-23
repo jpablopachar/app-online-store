@@ -1,5 +1,6 @@
 export enum COLLECTIONS {
-  USERS = 'users'
+  USERS = 'users',
+  GENRES = 'genres'
 }
 
 export enum EXPIRETIME {

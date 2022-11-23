@@ -1,6 +1,6 @@
 import { Db, Document, InsertManyResult, InsertOneResult, Sort } from 'mongodb'
 
-export const assignDocumentId = async (db: Db, collection: string, sort: Sort = { registerDate: -1 }): Promise<number> => {
+export const assignDocumentId = async (db: Db, collection: string, sort: Sort = { registerDate: -1 }): Promise<string> => {
   const lastElement = await db
     .collection(collection)
     .find()
@@ -8,9 +8,9 @@ export const assignDocumentId = async (db: Db, collection: string, sort: Sort = 
     .sort(sort)
     .toArray()
 
-  if (lastElement.length === 0) return 1
+  if (lastElement.length === 0) return '1'
 
-  return Number(lastElement[0].id) + 1
+  return String(Number(lastElement[0].id) + 1)
 }
 
 export const findOneElement = async (db: Db, collection: string, filter: any): Promise<any> => {
