@@ -1,4 +1,4 @@
-import { Db, InsertOneResult } from 'mongodb'
+import { Db, InsertOneResult, UpdateResult } from 'mongodb'
 import { findElements, findOneElement, insertOneElement } from '../config'
 import { IContextData } from '../models'
 
@@ -83,6 +83,38 @@ class ResolversOperationsService {
         status: false,
         message: `${item} no se ha insertado correctamente`,
         item: null
+      }
+    } catch {
+      return {
+        status: false,
+        message: `Se ha producido un error al insertar ${item}`,
+        item: null
+      }
+    }
+  }
+
+  protected async update (collection: string, filter: any, objectUpdate: any, item: string): Promise<{
+    status: boolean
+    message: string
+    item: any
+  }> {
+    try {
+      const res: UpdateResult = await this.getDb().collection(collection).updateOne(filter, { $set: objectUpdate })
+
+      console.log(res)
+
+      if (res !== null) {
+        return {
+          status: true,
+          message: `${item} actualizado correctamente`,
+          item: objectUpdate
+        }
+      } else {
+        return {
+          status: false,
+          message: `${item} no se ha actualizado correctamente`,
+          item: null
+        }
       }
     } catch {
       return {
