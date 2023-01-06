@@ -1,4 +1,4 @@
-import { Db, InsertOneResult, UpdateResult } from 'mongodb'
+import { Db, DeleteResult, InsertOneResult, UpdateResult } from 'mongodb'
 import { findElements, findOneElement, insertOneElement } from '../config'
 import { IContextData } from '../models'
 
@@ -121,6 +121,34 @@ class ResolversOperationsService {
         status: false,
         message: `Se ha producido un error al insertar ${item}`,
         item: null
+      }
+    }
+  }
+
+  protected async remove (collection: string, filter: any, item: string): Promise<{
+    status: boolean
+    message: string
+  }> {
+    try {
+      const res: DeleteResult = await this.getDb().collection(collection).deleteOne(filter)
+
+      console.log(res)
+
+      if (res.deletedCount === 1) {
+        return {
+          status: true,
+          message: `Elemento del ${item} eliminado correctamente`
+        }
+      } else {
+        return {
+          status: false,
+          message: `Elemento del ${item} no se ha eliminado correctamente. Compruebe el filtro`
+        }
+      }
+    } catch {
+      return {
+        status: false,
+        message: `Se ha producido un error al eliminar el ${item}. Inténtelo de nuevo.`
       }
     }
   }

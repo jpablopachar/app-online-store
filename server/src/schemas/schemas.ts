@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLSchema } from 'graphql'
-import { ADD_GENRE, REGISTER } from './Mutations'
+import { ADD_GENRE, BLOCK_GENRE, DELETE_GENRE, REGISTER, UPDATE_GENRE } from './Mutations'
 import { GENRE, GENRES, LOGIN, ME, USERS } from './Queries'
 
 const RootQuery = new GraphQLObjectType({
@@ -18,7 +18,9 @@ const Mutation = new GraphQLObjectType({
   fields: {
     register: REGISTER,
     addGenre: ADD_GENRE,
-    updateGenre
+    updateGenre: UPDATE_GENRE,
+    deleteGenre: DELETE_GENRE,
+    blockGenre: BLOCK_GENRE
   }
 })
 
