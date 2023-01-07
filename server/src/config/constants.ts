@@ -14,3 +14,13 @@ export enum EXPIRETIME {
 export enum MESSAGES {
   TOKEN_VERICATION_FAILED = 'Token no valido, inicia sesion de nuevo'
 }
+
+export enum ACTIVE_VALUES_FILTER {
+  ALL = 'ALL',
+  INACTIVE = 'INACTIVE',
+  ACTIVE = 'ACTIVE'
+}
+
+export enum SUBSCRIPTIONS_EVENT {
+  UPDATE_STOCK_PRODUCT = 'UPDATE_STOCK_PRODUCT'
+}

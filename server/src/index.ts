@@ -6,7 +6,6 @@ import { IContext } from './models'
 import { schema } from './schemas'
 
 config()
-// dbConnection()
 
 const PORT = process.env.PORT ?? 3000
 

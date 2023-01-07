@@ -1,5 +1,10 @@
 import { Db, DeleteResult, InsertOneResult, UpdateResult } from 'mongodb'
-import { findElements, findOneElement, insertOneElement } from '../config'
+import {
+  findElements,
+  findOneElement,
+  insertOneElement,
+  pagination
+} from '../config'
 import { IContextData } from '../models'
 
 class ResolversOperationsService {
@@ -13,19 +18,67 @@ class ResolversOperationsService {
     this._context = context
   }
 
-  protected getDb (): Db { return this._context.db as Db }
+  protected getDb (): Db {
+    return this._context.db as Db
+  }
 
-  protected getVariables (): any { return this._args }
+  protected getVariables (): any {
+    return this._args
+  }
 
-  protected async list (collection: string, listElement: string): Promise<{ status: boolean, message: string, items: any }> {
+  protected async list (
+    collection: string,
+    listElement: string,
+    page: number = 1,
+    itemsPage: number = 20,
+    filter: any = { active: { $ne: false } }
+  ): Promise<
+    | {
+      info: {
+        page: number
+        pages: number
+        itemsPage: number
+        total: number
+      }
+      status: boolean
+      message: string
+      items: any
+    }
+    | {
+      info: null
+      status: boolean
+      message: string
+      items: never[]
+    }
+    > {
     try {
+      const paginationData = await pagination(
+        this.getDb(),
+        collection,
+        page,
+        itemsPage,
+        filter
+      )
+
       return {
+        info: {
+          page: paginationData.page,
+          pages: paginationData.pages,
+          itemsPage: paginationData.itemsPage,
+          total: paginationData.total
+        },
         status: true,
         message: `Lista de ${listElement} cargada correctamente`,
-        items: await findElements(this._context.db as Db, collection)
+        items: await findElements(
+          this._context.db as Db,
+          collection,
+          filter,
+          paginationData
+        )
       }
     } catch (error) {
       return {
+        info: null,
         status: false,
         message: `Error al cargar la lista de ${listElement}`,
         items: []
@@ -33,11 +86,15 @@ class ResolversOperationsService {
     }
   }
 
-  protected async get (collection: string): Promise<{ status: boolean, message: string, item: any }> {
+  protected async get (
+    collection: string
+  ): Promise<{ status: boolean, message: string, item: any }> {
     const collectionTemp: string = collection.toLowerCase()
 
     try {
-      const res = await findOneElement(this._context.db as Db, collection, { id: this._args.id })
+      const res = await findOneElement(this._context.db as Db, collection, {
+        id: this._args.id
+      })
 
       if (res !== null) {
         return {
@@ -61,13 +118,21 @@ class ResolversOperationsService {
     }
   }
 
-  protected async add (collection: string, document: any, item: string): Promise<{
-    status: boolean
-    message: string
-    item: any
-  }> {
+  protected async add (
+    collection: string,
+    document: any,
+    item: string
+  ): Promise<{
+      status: boolean
+      message: string
+      item: any
+    }> {
     try {
-      const res: InsertOneResult<Document> = await insertOneElement(this._context.db as Db, collection, document)
+      const res: InsertOneResult<Document> = await insertOneElement(
+        this._context.db as Db,
+        collection,
+        document
+      )
 
       console.log(res)
 
@@ -93,13 +158,20 @@ class ResolversOperationsService {
     }
   }
 
-  protected async update (collection: string, filter: any, objectUpdate: any, item: string): Promise<{
-    status: boolean
-    message: string
-    item: any
-  }> {
+  protected async update (
+    collection: string,
+    filter: any,
+    objectUpdate: any,
+    item: string
+  ): Promise<{
+      status: boolean
+      message: string
+      item: any
+    }> {
     try {
-      const res: UpdateResult = await this.getDb().collection(collection).updateOne(filter, { $set: objectUpdate })
+      const res: UpdateResult = await this.getDb()
+        .collection(collection)
+        .updateOne(filter, { $set: objectUpdate })
 
       console.log(res)
 
@@ -125,12 +197,18 @@ class ResolversOperationsService {
     }
   }
 
-  protected async remove (collection: string, filter: any, item: string): Promise<{
-    status: boolean
-    message: string
-  }> {
+  protected async remove (
+    collection: string,
+    filter: any,
+    item: string
+  ): Promise<{
+      status: boolean
+      message: string
+    }> {
     try {
-      const res: DeleteResult = await this.getDb().collection(collection).deleteOne(filter)
+      const res: DeleteResult = await this.getDb()
+        .collection(collection)
+        .deleteOne(filter)
 
       console.log(res)
 
