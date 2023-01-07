@@ -1,43 +1,56 @@
-import { hashSync } from 'bcrypt'
-import { GraphQLNonNull } from 'graphql'
-import { assignDocumentId, COLLECTIONS, findOneElement, insertOneElement } from '../../config'
+import { GraphQLBoolean, GraphQLID, GraphQLNonNull } from 'graphql'
+import UsersService from '../../services/users'
 import { UserInputType } from '../Inputs'
 import { ResultUser } from '../TypeDefs'
 
 export const REGISTER = {
   type: ResultUser,
   args: {
-    user: { type: new GraphQLNonNull(UserInputType) }
+    user: {
+      type: new GraphQLNonNull(UserInputType),
+      description: 'Información del usuario a registrar'
+    }
   },
-  async resolve (parent: any, { user }: any, { db }: any): Promise<any> {
-    const userExists = await findOneElement(db, COLLECTIONS.USERS, { email: user.email })
+  async resolve (parent: any, { user }: any, context: any): Promise<any> {
+    return await new UsersService(parent, { user }, context).register()
+  },
+  description: 'Permite registrar un nuevo usuario'
+}
 
-    if (userExists !== null) {
-      return {
-        status: false,
-        message: 'El usuario ya existe',
-        user: null
-      }
+export const UPDATE_USER = {
+  type: ResultUser,
+  args: {
+    user: {
+      type: new GraphQLNonNull(UserInputType),
+      description: 'Información del usuario a actualizar'
     }
+  },
+  async resolve (parent: any, { user }: any, context: any): Promise<any> {
+    return await new UsersService(parent, { user }, context).modify()
+  },
+  description: 'Permite actualizar un usuario'
+}
 
-    user.id = await assignDocumentId(db, COLLECTIONS.USERS, { registerDate: -1 })
-    user.registerDate = new Date().toISOString()
-    user.password = hashSync(user.password, 10)
+export const DELETE_USER = {
+  type: ResultUser,
+  args: {
+    id: { type: new GraphQLNonNull(GraphQLID), description: 'ID del usuario' }
+  },
+  async resolve (parent: any, { id }: any, context: any): Promise<any> {
+    return await new UsersService(parent, { id }, context).delete()
+  },
+  description: 'Permite eliminar un usuario'
+}
 
-    try {
-      await insertOneElement(db, COLLECTIONS.USERS, user)
-
-      return {
-        status: true,
-        message: 'Usuario registrado correctamente',
-        user
-      }
-    } catch {
-      return {
-        status: false,
-        message: 'Se ha producido un error al registrar el usuario',
-        user: null
-      }
-    }
-  }
+export const BLOCK_USER = {
+  type: ResultUser,
+  args: {
+    id: { type: new GraphQLNonNull(GraphQLID), description: 'ID del usuario' },
+    unblock: { type: GraphQLBoolean, defaultValue: false, description: 'Bloquear o desbloquear el usuario' },
+    admin: { type: GraphQLBoolean, defaultValue: false, description: 'Procedencia de la petición para modificar' }
+  },
+  async resolve (parent: any, { id, unblock, admin }: any, context: any): Promise<any> {
+    return await new UsersService(parent, { id, unblock, admin }, context).unblock(unblock, admin)
+  },
+  description: 'Permite bloquear o desbloquear un usuario'
 }

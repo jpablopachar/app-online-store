@@ -1,9 +1,11 @@
 import { Db, DeleteResult, InsertOneResult, UpdateResult } from 'mongodb'
 import {
+  deleteOneElement,
   findElements,
   findOneElement,
   insertOneElement,
-  pagination
+  pagination,
+  updateOneElement
 } from '../config'
 import { IContextData } from '../models'
 
@@ -169,24 +171,25 @@ class ResolversOperationsService {
       item: any
     }> {
     try {
-      const res: UpdateResult = await this.getDb()
-        .collection(collection)
-        .updateOne(filter, { $set: objectUpdate })
+      const res: UpdateResult = await updateOneElement(
+        this.getDb(),
+        collection,
+        filter,
+        objectUpdate
+      )
 
-      console.log(res)
-
-      if (res !== null) {
+      if (res.modifiedCount === 1 && res.acknowledged) {
         return {
           status: true,
           message: `${item} actualizado correctamente`,
-          item: objectUpdate
+          item: Object.assign({}, filter, objectUpdate)
         }
-      } else {
-        return {
-          status: false,
-          message: `${item} no se ha actualizado correctamente`,
-          item: null
-        }
+      }
+
+      return {
+        status: false,
+        message: `${item} no se ha actualizado correctamente`,
+        item: null
       }
     } catch {
       return {
@@ -206,22 +209,22 @@ class ResolversOperationsService {
       message: string
     }> {
     try {
-      const res: DeleteResult = await this.getDb()
-        .collection(collection)
-        .deleteOne(filter)
-
-      console.log(res)
+      const res: DeleteResult = await deleteOneElement(
+        this.getDb(),
+        collection,
+        filter
+      )
 
       if (res.deletedCount === 1) {
         return {
           status: true,
           message: `Elemento del ${item} eliminado correctamente`
         }
-      } else {
-        return {
-          status: false,
-          message: `Elemento del ${item} no se ha eliminado correctamente. Compruebe el filtro`
-        }
+      }
+
+      return {
+        status: false,
+        message: `Elemento del ${item} no se ha eliminado correctamente. Compruebe el filtro`
       }
     } catch {
       return {

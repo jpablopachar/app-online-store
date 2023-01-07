@@ -1,7 +1,8 @@
-import { compareSync } from 'bcrypt'
+import { compareSync, hashSync } from 'bcrypt'
 import { JwtPayload } from 'jsonwebtoken'
 import {
   ACTIVE_VALUES_FILTER,
+  assignDocumentId,
   COLLECTIONS,
   EXPIRETIME,
   findOneElement,
@@ -125,6 +126,198 @@ class UsersService extends ResolversOperationsService {
         token: null
       }
     }
+  }
+
+  public async register (): Promise<{
+    status: boolean
+    message: string
+    user: any
+  }> {
+    const user = this.getVariables().user
+
+    if (user === null) {
+      return {
+        status: false,
+        message: 'No se recibieron datos para el registro',
+        user: null
+      }
+    }
+
+    if (
+      user?.password === null ||
+      user?.password === undefined ||
+      user?.password === ''
+    ) {
+      return {
+        status: false,
+        message: 'No se recibió la contraseña',
+        user: null
+      }
+    }
+
+    const userExists = await findOneElement(this.getDb(), this._collection, {
+      email: user.email
+    })
+
+    if (userExists !== null) {
+      return {
+        status: false,
+        message: 'El usuario ya existe',
+        user: null
+      }
+    }
+
+    user.id = await assignDocumentId(this.getDb(), this._collection, {
+      registerDate: -1
+    })
+    user.registerDate = new Date().toISOString()
+    user.password = hashSync(user.password, 10)
+
+    const res = await this.add(this._collection, user || {}, 'usuario')
+
+    return {
+      status: res.status,
+      message: res.message,
+      user: res.item
+    }
+  }
+
+  public async modify (): Promise<{
+    status: boolean
+    message: string
+    user: any
+  }> {
+    const user = this.getVariables().user
+
+    if (user === null) {
+      return {
+        status: false,
+        message: 'No se recibieron datos para la actualización',
+        user: null
+      }
+    }
+
+    const filter = { id: user?.id }
+
+    const res = await this.update(
+      this._collection,
+      filter,
+      user || {},
+      'usuario'
+    )
+
+    return {
+      status: res.status,
+      message: res.message,
+      user: res.item
+    }
+  }
+
+  public async delete (): Promise<
+  | {
+    status: boolean
+    message: string
+  }
+  | {
+    status: boolean
+    message: string
+    user: null
+  }
+  > {
+    const id = this.getVariables().id
+
+    if (id === undefined || id === '') {
+      return {
+        status: false,
+        message: 'No se recibieron datos para eliminar el usuario',
+        user: null
+      }
+    }
+
+    const res = await this.remove(this._collection, { id }, 'usuario')
+
+    return {
+      status: res.status,
+      message: res.message
+    }
+  }
+
+  public async unblock (
+    unblock: boolean,
+    admin: boolean
+  ): Promise<
+    | {
+      status: boolean
+      message: string
+    }
+    | {
+      status: boolean
+      message: string
+      genre: null
+    }
+    > {
+    const id: string = String(this.getVariables().id) || ''
+    const user = this.getVariables().user
+
+    if (!this._checkData(id)) {
+      return {
+        status: false,
+        message: 'No se recibió el id del usuario',
+        genre: null
+      }
+    }
+
+    if (user?.password === '1234') {
+      return {
+        status: false,
+        message: 'La contraseña es incorrecta'
+      }
+    }
+
+    let update: { active: boolean } = { active: unblock }
+
+    if (unblock && !admin) {
+      update = Object.assign(
+        {},
+        { active: true },
+        { password: hashSync(user?.password, 10) }
+      )
+    }
+
+    const res = await this.update(this._collection, { id }, update, 'usuario')
+
+    const action: string = unblock ? 'Desbloqueado' : 'Bloqueado'
+
+    return {
+      status: res.status,
+      message: res.status
+        ? `Usuario ${action.toLowerCase()}`
+        : `Error al ${action.toLocaleLowerCase()} el usuario`
+    }
+  }
+
+  /* public async active () {
+    const id = this.getVariables().user?.id
+    const email = this.getVariables().user?.email || ''
+
+    if (email === undefined || email === '') {
+      return {
+        status: false,
+        message: 'No se recibió el correo electrónico'
+      }
+    }
+
+    const token: string = await signJwt({ id, email }, EXPIRETIME.H1)
+    const html = `Para activar la cuenta haz click sobre esto: <a href='${process.env.CLIENT_URL as string}/#/active/${token}'>Clic aquí</a>`
+    const mail = {
+      subject: 'Activar usuario',
+      to: email,
+      html
+    }
+  } */
+
+  private _checkData (value: string): boolean {
+    return value !== '' || value !== undefined
   }
 }
 
