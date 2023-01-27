@@ -136,8 +136,6 @@ class ResolversOperationsService {
         document
       )
 
-      console.log(res)
-
       if (res.acknowledged) {
         return {
           status: true,
