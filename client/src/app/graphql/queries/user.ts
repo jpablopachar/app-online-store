@@ -16,9 +16,25 @@ export const LOGIN = gql`
   ${USER_FRAGMENT}
 `
 
-export const USERS_LIST = gql`
+/* export const USERS_LIST = gql`
   query usersList ($include: Boolean!, $page: Int, $itemsPage: Int, $active: ActiveFilterEnum){
     users(page: $page, itemsPage: $itemsPage, active: $active) {
+      info {
+        ...ResultInfoObj
+      }
+      status
+      message
+      users {
+        ...UserObj
+      }
+    }
+  }
+  ${ USER_FRAGMENT }
+  ${ RESULT_INFO_FRAGMENT }
+`; */
+export const USERS_LIST = gql`
+  query usersList ($include: Boolean!, $page: Int, $itemsPage: Int){
+    users(page: $page, itemsPage: $itemsPage) {
       info {
         ...ResultInfoObj
       }

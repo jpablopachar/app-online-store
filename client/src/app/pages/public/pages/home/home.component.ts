@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { GraphqlService } from '@app/graphql'
+import { UsersService } from '@app/services'
 
 @Component({
   selector: 'app-home',
@@ -7,9 +7,12 @@ import { GraphqlService } from '@app/graphql'
   styles: [],
 })
 export class HomeComponent implements OnInit {
-  constructor(private _graphqlService: GraphqlService) {}
+  constructor(private readonly _usersService: UsersService) { }
 
   ngOnInit(): void {
+    this._usersService.getUsers().subscribe((res): void => {
+      console.log(res);
+    });
     /* this._graphqlService
       .login('jppachar@yopmail.com', '123456789')
       .subscribe((res): void => {
